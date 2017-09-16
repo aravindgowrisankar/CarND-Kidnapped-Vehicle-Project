@@ -26,7 +26,7 @@ void ParticleFilter::init(double x, double y, double theta, double std_devs[]) {
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 
-  num_particles=100;
+  num_particles=2500;
   normal_distribution<double> dist_x(x, std_devs[0]);
   normal_distribution<double> dist_y(y, std_devs[1]);
   normal_distribution<double> dist_theta(theta, std_devs[2]);
@@ -95,7 +95,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
   double num_predicted=predicted.size();
   double num_observations=observations.size();
   int min_j;
-  cout<<"Num Landmarks"<<num_predicted<<" Num observations"<<num_observations<<endl;
+  //cout<<"Num Landmarks"<<num_predicted<<" Num observations"<<num_observations<<endl;
   if (num_predicted==0)
     return;
   double min_dist;
@@ -176,8 +176,8 @@ double update_particle_weight(std::vector<LandmarkObs> observations,Map map_land
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
 		std::vector<LandmarkObs> observations, Map map_landmarks) {
 
-  cout<<"Obs size"<<observations.size();
-  cout<<"Sensor range"<<sensor_range<<endl;
+  //cout<<"Obs size"<<observations.size();
+  //cout<<"Sensor range"<<sensor_range<<endl;
   for (int i=0;i<num_particles;i++) {
     std::vector<LandmarkObs> transformed_obs=transform(particles[i].x, particles[i].y, particles[i].theta,observations);
     std::vector<LandmarkObs> map_landmarks_subset;
@@ -235,8 +235,8 @@ void ParticleFilter::resample() {
     }
     weight_sum += particles[i].weight;
   }
-  cout << "In Resample: before  highest w " << highest_weight << endl;
-  cout << "In Resample: before  average w " << weight_sum/num_particles << endl;  
+  //cout << "In Resample: before  highest w " << highest_weight << endl;
+  //cout << "In Resample: before  average w " << weight_sum/num_particles << endl;  
 
 
   std::random_device rd;
@@ -266,10 +266,10 @@ void ParticleFilter::resample() {
       highest_weight = particles[i].weight;
     }
     weight_sum += particles[i].weight;
-    cout<<"Particle "<<i<<" ("<<particles[i].x<<","<<particles[i].y<<")"<<endl;
+    //cout<<"Particle "<<i<<" ("<<particles[i].x<<","<<particles[i].y<<")"<<endl;
   }
-  cout << "Resample highest w " << highest_weight << endl;
-  cout << "Resample average w " << weight_sum/num_particles << endl;  
+  //cout << "Resample highest w " << highest_weight << endl;
+  //cout << "Resample average w " << weight_sum/num_particles << endl;  
 }
 
 Particle ParticleFilter::SetAssociations(Particle particle, std::vector<int> associations, std::vector<double> sense_x, std::vector<double> sense_y)
