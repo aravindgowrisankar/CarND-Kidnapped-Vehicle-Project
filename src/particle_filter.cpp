@@ -30,7 +30,8 @@ void ParticleFilter::init(double x, double y, double theta, double std_devs[]) {
   normal_distribution<double> dist_x(x, std_devs[0]);
   normal_distribution<double> dist_y(y, std_devs[1]);
   normal_distribution<double> dist_theta(theta, std_devs[2]);
-  default_random_engine gen;
+  std::random_device rd;
+  std::mt19937 gen(rd());
 
   for (int i=0;i<num_particles;i++) {
     Particle p;
@@ -52,12 +53,21 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
   // TBD: Adding noise
-  default_random_engine gen;
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+
+  normal_distribution<double> dist_x(0, std_pos[0]);
+  normal_distribution<double> dist_y(0, std_pos[1]);
+  normal_distribution<double> dist_theta(0, std_pos[2]);
+
   for (int i=0;i<num_particles;i++) {
     double x=particles[i].x;
     double y=particles[i].y;
     double theta=particles[i].theta;
     double theta_new,x_new,y_new;
+    //Centering the noise around 0 mean
+
     if (yaw_rate<0.0001) {
       theta_new=theta;
       x_new=x+(velocity*delta_t*cos(theta));
@@ -68,13 +78,10 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
       x_new=x+(velocity/yaw_rate)*(sin(theta_new)-sin(theta));
       y_new=y+(velocity/yaw_rate)*(cos(theta)-cos(theta_new));
     }
-    normal_distribution<double> dist_x(x_new, std_pos[0]);
-    normal_distribution<double> dist_y(y_new, std_pos[1]);
-    normal_distribution<double> dist_theta(theta_new, std_pos[2]);
 
-    particles[i].theta=dist_theta(gen);
-    particles[i].x=dist_x(gen);
-    particles[i].y=dist_y(gen);
+    particles[i].theta=theta_new+dist_theta(gen);
+    particles[i].x=x_new+dist_x(gen);
+    particles[i].y=y_new+dist_y(gen);
     //cout<<"Old:("<<x<<","<<y<<") New:("<<particles[i].x<<","<<particles[i].y;
   }
 }
@@ -88,7 +95,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
   double num_predicted=predicted.size();
   double num_observations=observations.size();
   int min_j;
-  //cout<<"Num Landmarks"<<num_predicted<<" Num observations"<<num_observations;
+  cout<<"Num Landmarks"<<num_predicted<<" Num observations"<<num_observations<<endl;
   if (num_predicted==0)
     return;
   double min_dist;
