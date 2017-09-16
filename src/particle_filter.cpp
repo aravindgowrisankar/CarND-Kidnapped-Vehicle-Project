@@ -26,7 +26,7 @@ void ParticleFilter::init(double x, double y, double theta, double std_devs[]) {
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 
-  num_particles=2500;
+  num_particles=1000;
   normal_distribution<double> dist_x(x, std_devs[0]);
   normal_distribution<double> dist_y(y, std_devs[1]);
   normal_distribution<double> dist_theta(theta, std_devs[2]);
@@ -175,7 +175,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
       int id=map_landmarks.landmark_list[i].id_i;
       double distance=dist(particles[i].x,particles[i].y,x,y);
       //cout<<"Distance="<<distance;
-      if (distance<sensor_range){
+      if (distance<1.5*sensor_range){
         LandmarkObs candidate;
         candidate.x=x;
         candidate.id=id;
@@ -185,6 +185,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
       }
     }//compute landmarks
     dataAssociation(map_landmarks_subset,transformed_obs);
+
     std::vector<int> associations;
     std::vector<double> sense_x;
     std::vector<double> sense_y;
@@ -198,16 +199,6 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     particles[i].weight=update_particle_weight(transformed_obs,map_landmarks);
     weights[i]=particles[i].weight;
   }
-	// TODO: Update the weights of each particle using a mult-variate Gaussian distribution. You can read
-	//   more about this distribution here: https://en.wikipedia.org/wiki/Multivariate_normal_distribution
-	// NOTE: The observations are given in the VEHICLE'S coordinate system. Your particles are located
-	//   according to the MAP'S coordinate system. You will need to transform between the two systems.
-	//   Keep in mind that this transformation requires both rotation AND translation (but no scaling).
-	//   The following is a good resource for the theory:
-	//   https://www.willamette.edu/~gorr/classes/GeneralGraphics/Transforms/transforms2d.htm
-	//   and the following is a good resource for the actual equation to implement (look at equation 
-	//   3.33
-	//   http://planning.cs.uiuc.edu/node99.html
 }
 
 void ParticleFilter::resample() {
@@ -258,17 +249,6 @@ void ParticleFilter::resample() {
   }
   particles.clear();
   particles=new_particles;
-  // highest_weight = -1.0;
-  // weight_sum = 0.0;
-  // for (int i = 0; i < num_particles; ++i) {
-  //   if (particles[i].weight > highest_weight) {
-  //     highest_weight = particles[i].weight;
-  //   }
-  //   weight_sum += particles[i].weight;
-  //   //cout<<"Particle "<<i<<" ("<<particles[i].x<<","<<particles[i].y<<")"<<endl;
-  // }
-  //cout << "Resample highest w " << highest_weight << endl;
-  //cout << "Resample average w " << weight_sum/num_particles << endl;  
 }
 
 Particle ParticleFilter::SetAssociations(Particle particle, std::vector<int> associations, std::vector<double> sense_x, std::vector<double> sense_y)
