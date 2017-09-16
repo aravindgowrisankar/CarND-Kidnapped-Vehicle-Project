@@ -52,18 +52,25 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
   // TBD: Adding noise
-
+  default_random_engine gen;
   for (int i=0;i<num_particles;i++) {
     double x=particles[i].x;
     double y=particles[i].y;
     double theta=particles[i].theta;
-    double theta_new=theta+(yaw_rate*delta_t);
-    double x_new=x+(velocity/yaw_rate)*(sin(theta_new)-sin(theta));
-    double y_new=y+(velocity/yaw_rate)*(cos(theta)-cos(theta_new));
+    double theta_new,x_new,y_new;
+    if (yaw_rate<0.0001) {
+      theta_new=theta;
+      x_new=x+(velocity*delta_t*cos(theta));
+      y_new=y+(velocity*delta_t*sin(theta));
+    }
+    else{
+      theta_new=theta+(yaw_rate*delta_t);
+      x_new=x+(velocity/yaw_rate)*(sin(theta_new)-sin(theta));
+      y_new=y+(velocity/yaw_rate)*(cos(theta)-cos(theta_new));
+    }
     normal_distribution<double> dist_x(x_new, std_pos[0]);
     normal_distribution<double> dist_y(y_new, std_pos[1]);
     normal_distribution<double> dist_theta(theta_new, std_pos[2]);
-    default_random_engine gen;
 
     particles[i].theta=dist_theta(gen);
     particles[i].x=dist_x(gen);
