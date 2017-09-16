@@ -121,19 +121,6 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 
 }
 
-std::vector<LandmarkObs> transform_old(double particle_x, double particle_y, double  particle_theta, std::vector<LandmarkObs> observations) {
-  std::vector<LandmarkObs> transformed_observations;
-  for (int i=0;i<observations.size();i++) {
-    LandmarkObs tobs;
-    tobs.id=observations[i].id;
-    double r=observations[i].y-(observations[i].x/tan(particle_theta));
-    tobs.x=particle_x-(r*sin(particle_theta));
-    tobs.y=particle_y+(observations[i].x/sin(particle_theta))+(r*cos(particle_theta));
-    transformed_observations.push_back(tobs);
-    //cout<<"original ("<<observations[i].x<<","<<observations[i].y<<")"<<" transformed ("<<tobs.x<<","<<tobs.y<<")";
-  }
-  return transformed_observations;
-}
 
 std::vector<LandmarkObs> transform(double particle_x, double particle_y, double  particle_theta, std::vector<LandmarkObs> observations) {
   std::vector<LandmarkObs> transformed_observations;
@@ -238,6 +225,18 @@ void ParticleFilter::resample() {
   //cout << "In Resample: before  highest w " << highest_weight << endl;
   //cout << "In Resample: before  average w " << weight_sum/num_particles << endl;  
 
+  // if (weight_sum<0.0){
+  //   //for some reason or the other if the particles all lose track, retain particles from last iteration as such.
+  //   cout<<"Weights sum less than zero, not resampling"<<endl;
+  //   return;
+  // }
+
+  // if (weight_sum==0.0){
+  //   //for some reason or the other if the particles all lose track, retain particles from last iteration as such.
+  //   cout<<"Weights sum equal to zero, not resampling"<<endl;
+  //   return;
+  // }
+  
 
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -259,15 +258,15 @@ void ParticleFilter::resample() {
   }
   particles.clear();
   particles=new_particles;
-  highest_weight = -1.0;
-  weight_sum = 0.0;
-  for (int i = 0; i < num_particles; ++i) {
-    if (particles[i].weight > highest_weight) {
-      highest_weight = particles[i].weight;
-    }
-    weight_sum += particles[i].weight;
-    //cout<<"Particle "<<i<<" ("<<particles[i].x<<","<<particles[i].y<<")"<<endl;
-  }
+  // highest_weight = -1.0;
+  // weight_sum = 0.0;
+  // for (int i = 0; i < num_particles; ++i) {
+  //   if (particles[i].weight > highest_weight) {
+  //     highest_weight = particles[i].weight;
+  //   }
+  //   weight_sum += particles[i].weight;
+  //   //cout<<"Particle "<<i<<" ("<<particles[i].x<<","<<particles[i].y<<")"<<endl;
+  // }
   //cout << "Resample highest w " << highest_weight << endl;
   //cout << "Resample average w " << weight_sum/num_particles << endl;  
 }
