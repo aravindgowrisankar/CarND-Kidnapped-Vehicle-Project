@@ -135,7 +135,7 @@ std::vector<LandmarkObs> transform(double particle_x, double particle_y, double 
   return transformed_observations;
 }
 
-double update_particle_weight(std::vector<LandmarkObs> observations,Map map_landmarks){
+double update_particle_weight(std::vector<LandmarkObs> observations,Map const &map_landmarks){
   double prob = 1.0;
 
   double sigma_pos [3] = {0.3, 0.3, 0.01}; // GPS measurement uncertainty [x [m], y [m], theta [rad]]
@@ -161,7 +161,7 @@ double update_particle_weight(std::vector<LandmarkObs> observations,Map map_land
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
-		std::vector<LandmarkObs> observations, Map map_landmarks) {
+		std::vector<LandmarkObs> observations, Map const &map_landmarks) {
 
   //cout<<"Obs size"<<observations.size();
   //cout<<"Sensor range"<<sensor_range<<endl;
@@ -225,17 +225,17 @@ void ParticleFilter::resample() {
   //cout << "In Resample: before  highest w " << highest_weight << endl;
   //cout << "In Resample: before  average w " << weight_sum/num_particles << endl;  
 
-  // if (weight_sum<0.0){
-  //   //for some reason or the other if the particles all lose track, retain particles from last iteration as such.
-  //   cout<<"Weights sum less than zero, not resampling"<<endl;
-  //   return;
-  // }
+  if (weight_sum<0.0){
+    //for some reason or the other if the particles all lose track, retain particles from last iteration as such.
+    cout<<"Weights sum less than zero, not resampling"<<endl;
+    return;
+  }
 
-  // if (weight_sum==0.0){
-  //   //for some reason or the other if the particles all lose track, retain particles from last iteration as such.
-  //   cout<<"Weights sum equal to zero, not resampling"<<endl;
-  //   return;
-  // }
+  if (weight_sum==0.0){
+    //for some reason or the other if the particles all lose track, retain particles from last iteration as such.
+    cout<<"Weights sum equal to zero, not resampling"<<endl;
+    return;
+  }
   
 
   std::random_device rd;
